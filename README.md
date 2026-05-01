@@ -15,3 +15,7 @@ This project is a multi-agent AI system built using n8n and OpenRouter.
 
 ## Workflow
 Webhook → Set → 5 AI Agents → Merge → Function → Response
+
+## Workflow Screenshot
+
+![Workflow](workflow.png)
