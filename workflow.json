@@ -1,0 +1,408 @@
+{
+  "name": "AI Marketing Assistant (OpenRouter Free)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ai-marketing-agent",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "d34332ca-4959-4453-a596-aeb661740553",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "3f4e6e9b-c31c-468d-95b7-95bd461d3454"
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "product",
+              "value": "={{$json[\"product\"]}}"
+            },
+            {
+              "name": "price",
+              "value": "={{$json[\"price\"]}}"
+            },
+            {
+              "name": "city",
+              "value": "={{$json[\"city\"]}}"
+            },
+            {
+              "name": "festival",
+              "value": "={{$json[\"festival\"]}}"
+            },
+            {
+              "name": "profession",
+              "value": "={{$json[\"profession\"]}}"
+            },
+            {
+              "name": "review",
+              "value": "={{$json[\"review\"]}}"
+            },
+            {
+              "name": "customer_type",
+              "value": "={{$json[\"customer_type\"]}}"
+            }
+          ],
+          "number": [
+            {
+              "name": "customer_age",
+              "value": "={{$json[\"customer_age\"]}}"
+            },
+            {
+              "name": "rating",
+              "value": "={{$json[\"rating\"]}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ac0ec7ee-215c-4ed1-a966-6e6e27885773",
+      "name": "Set Input",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "let content = items[0].json.choices[0].message.content;\n\ncontent = content.replace(/```json/g, '').replace(/```/g, '').trim();\n\ntry {\n  const output = JSON.parse(content);\n  return [{ json: output }];\n} catch (e) {\n  return [{ json: { error: \"Invalid JSON from AI\", raw: content } }];\n}"
+      },
+      "id": "417abb82-1fc0-4b5e-b870-3a9524480fb4",
+      "name": "Parse Output",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        608,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "989ad909-7bb1-4c26-91c1-281889a5cf1c",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        800,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"deepseek/deepseek-chat\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Create a {{$json.festival}} marketing campaign for {{$json.product}}.\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "e69edd2c-5fb5-45e5-beb0-8d68a7fce766",
+      "name": "Campaign Agent",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        192,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"deepseek/deepseek-chat\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Write a car advertisement for {{$json.product}} in {{$json.city}} priced at {{$json.price}}.\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "38350d30-efa4-4b28-8e3e-84e39fbcca7d",
+      "name": "Ad Copy Agent",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        400,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"deepseek/deepseek-chat\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Create a customer persona for a {{$json.customer_age}} year old {{$json.profession}}.\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "cbb87f69-b519-4fb2-acc6-2f13aa993a07",
+      "name": "Persona Agent",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        448,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"deepseek/deepseek-chat\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Respond to this review: {{$json.review}} with rating {{$json.rating}}.\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "dc47b3b5-6ec0-4dcd-a6af-1201e38b34b7",
+      "name": "Review Agent",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        656,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"deepseek/deepseek-chat\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Write a WhatsApp marketing message for {{$json.customer_type}} customer about {{$json.product}}.\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "88dfb5ef-f580-4c35-82ae-3eb96012f2aa",
+      "name": "Whatsapp Agent",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        896,
+        176
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "numberInputs": 5,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        544,
+        288
+      ],
+      "id": "b18a93fd-3742-42fa-8704-9d80ac0ae0f1",
+      "name": "Merge"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Input": {
+      "main": [
+        [
+          {
+            "node": "Ad Copy Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Campaign Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Persona Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Review Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Whatsapp Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Output": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ad Copy Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Campaign Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Persona Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Review Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Whatsapp Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Parse Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "9c503cd4-f9b6-4ce8-99d6-22fd01b1ff91",
+  "meta": {
+    "instanceId": "66e1d89dd25c90af7782ace4c64ba2c4e26bb2ff966b82ba59c1023cdb2b320b"
+  },
+  "id": "zEbueGWVUxyZNY2q",
+  "tags": []
+}
